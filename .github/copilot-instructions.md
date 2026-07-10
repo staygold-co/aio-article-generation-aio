@@ -1,0 +1,5 @@
+- [x] プロジェクトのセットアップと実装を自動で進める
+- [x] Next.js + TypeScript + Tailwind の MVS を構築する
+- [x] URL解析、記事生成、AIO診断、WordPress投稿を実装する
+- [x] SQLite DBモデルと業種シードを追加する
+- [x] README と .env.example を用意する

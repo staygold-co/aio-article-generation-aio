@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  /* Apple風の統一フォント: Apple端末では本物のSF Pro、それ以外はInterに寄せる。
+     日本語はHiragino/Yu Gothic系で端正に揃える。 */
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    var(--font-inter), 'Segoe UI', Roboto,
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', Meiryo, sans-serif;
+  letter-spacing: -0.011em;
+  color: #e2e8f0;
+  background: #070a14;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 動く オーロラ状の背景グロー（ティール×バイオレット×スカイ） */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(60% 50% at 15% 0%, rgba(45, 212, 191, 0.16), transparent 60%),
+    radial-gradient(55% 45% at 85% 5%, rgba(139, 92, 246, 0.18), transparent 60%),
+    radial-gradient(55% 45% at 50% 105%, rgba(56, 189, 248, 0.12), transparent 60%),
+    #070a14;
+  animation: auroraPan 20s ease-in-out infinite alternate;
+}
+
+/* 薄いテックグリッド */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(circle at 50% 25%, black, transparent 78%);
+  mask-image: radial-gradient(circle at 50% 25%, black, transparent 78%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input, select, textarea, button {
+  font: inherit;
+}
+
+option {
+  color: #0f172a;
+}
+
+::selection {
+  background: rgba(45, 212, 191, 0.3);
+}
+
+/* ===== keyframes ===== */
+@keyframes auroraPan {
+  from { transform: translate3d(-1%, -1%, 0) scale(1); }
+  to   { transform: translate3d(1.5%, 2%, 0) scale(1.06); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spinRev { to { transform: rotate(-360deg); } }
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.14); }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.9; }
+}
+@keyframes sweep {
+  0%   { transform: translateX(-140%); }
+  100% { transform: translateX(140%); }
+}
+@keyframes scanY {
+  0%   { transform: translateY(-20%); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateY(2200%); opacity: 0; }
+}
+@keyframes blink {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.55); opacity: 1; }
+  50%      { box-shadow: 0 0 0 7px rgba(45, 212, 191, 0);   opacity: 0.6; }
+}
+@keyframes gradientPan {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes barPulse {
+  0%, 100% { transform: scaleY(0.3); }
+  50%      { transform: scaleY(1); }
+}
+@keyframes dashFlow { to { stroke-dashoffset: -240; } }
+@keyframes dashFlowRev { to { stroke-dashoffset: 240; } }
+@keyframes haloPulse {
+  0%, 100% { opacity: 0.15; transform: scale(0.85); }
+  50%      { opacity: 0.6;  transform: scale(1.15); }
+}
+@keyframes nodeTwinkle {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+@keyframes linkFlicker {
+  0%, 100% { opacity: 0.05; }
+  40%      { opacity: 0.35; }
+  60%      { opacity: 0.12; }
+}
+
+/* ===== utilities ===== */
+.svg-center { transform-box: fill-box; transform-origin: center; }
+.spin-90 { animation: spin 90s linear infinite; }
+.spin-60 { animation: spin 60s linear infinite; }
+.spin-rev-50 { animation: spinRev 50s linear infinite; }
+.spin-40 { animation: spin 40s linear infinite; }
+.spin-rev-30 { animation: spinRev 30s linear infinite; }
+.spin-24 { animation: spin 24s linear infinite; }
+.spin-rev-16 { animation: spinRev 16s linear infinite; }
+.dash-flow { animation: dashFlow 4s linear infinite; }
+.dash-flow-rev { animation: dashFlowRev 6s linear infinite; }
+.halo-pulse { animation: haloPulse 4s ease-in-out infinite; }
+.node-tw { animation: nodeTwinkle 2.4s ease-in-out infinite; }
+.link-fl { animation: linkFlicker 3s ease-in-out infinite; }
+.floaty { animation: floaty 7s ease-in-out infinite; }
+.core-pulse { animation: pulseGlow 3.2s ease-in-out infinite; }
+
+.glass {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-hover { transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease; }
+.glass-hover:hover {
+  border-color: rgba(94, 234, 212, 0.35);
+  box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.15), 0 24px 60px -30px rgba(45, 212, 191, 0.4);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #5eead4, #38bdf8, #a78bfa, #5eead4);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientPan 6s linear infinite;
+}
+
+.dot-live { animation: blink 1.6s ease-in-out infinite; }
+.scanline { animation: scanY 2.4s ease-in-out infinite; }
+.sweep { animation: sweep 3s ease-in-out infinite; }
+.eq-bar { transform-origin: bottom; animation: barPulse 1s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}

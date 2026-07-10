@@ -1,0 +1,10 @@
+# Netlify で Next.js（App Router + API Routes）を動かす設定
+[build]
+  command = "npm run build"
+
+# Next.js ランタイム（API RoutesをServerless Functions化）
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"

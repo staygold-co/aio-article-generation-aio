@@ -1,4 +1,5 @@
-import { createClient, type Client, type InArgs } from '@libsql/client';
+import { createClient as createWebClient } from '@libsql/client/web';
+import type { Client, InArgs } from '@libsql/client';
 
 // 既存の呼び出し側（db.all / db.run / db.exec）をそのまま使えるようにするアダプタ型
 type Database = {
@@ -10,18 +11,24 @@ type Database = {
 let dbPromise: Promise<Database> | null = null;
 
 // 接続先を決定する。
-// - TURSO_DATABASE_URL があればそれ（本番: Turso / libSQL リモート）
-// - なければローカルのファイルDB（開発時: file:local.db）
-function buildClient(): Client {
+// - TURSO_DATABASE_URL（libsql:// など）: ピュアJSのwebクライアントを使う
+//   （ネイティブ依存がなく、Netlify等のServerless Functionで安全に動作）
+// - 未設定（開発時 file:local.db）: nodeクライアントを動的importで使う
+//   （ローカル専用。ネイティブはローカルのみで読み込まれ、本番バンドルに含めない）
+async function buildClient(): Promise<Client> {
   const url = process.env.TURSO_DATABASE_URL || 'file:local.db';
   const authToken = process.env.TURSO_AUTH_TOKEN;
-  return createClient(authToken ? { url, authToken } : { url });
+  if (url.startsWith('file:')) {
+    const { createClient } = await import('@libsql/client');
+    return createClient({ url });
+  }
+  return createWebClient(authToken ? { url, authToken } : { url });
 }
 
 export async function getDatabase(): Promise<Database> {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const client = buildClient();
+      const client = await buildClient();
 
       // スキーマ初期化（複数ステートメントは executeMultiple で実行）
       await client.executeMultiple(`

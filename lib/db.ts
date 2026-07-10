@@ -1,4 +1,4 @@
-import { createClient as createWebClient } from '@libsql/client/web';
+import { createClient } from '@libsql/client/web';
 import type { Client, InArgs } from '@libsql/client';
 
 // 既存の呼び出し側（db.all / db.run / db.exec）をそのまま使えるようにするアダプタ型
@@ -10,25 +10,25 @@ type Database = {
 
 let dbPromise: Promise<Database> | null = null;
 
-// 接続先を決定する。
-// - TURSO_DATABASE_URL（libsql:// など）: ピュアJSのwebクライアントを使う
-//   （ネイティブ依存がなく、Netlify等のServerless Functionで安全に動作）
-// - 未設定（開発時 file:local.db）: nodeクライアントを動的importで使う
-//   （ローカル専用。ネイティブはローカルのみで読み込まれ、本番バンドルに含めない）
-async function buildClient(): Promise<Client> {
-  const url = process.env.TURSO_DATABASE_URL || 'file:local.db';
+// Turso / libSQL への接続。
+// ネイティブ依存のない web クライアントのみを使うため、Netlify等の
+// Serverless Function でも安全にバンドル・実行できる。
+// ローカル開発でも .env に TURSO_DATABASE_URL / TURSO_AUTH_TOKEN を設定すれば同じ経路で動く。
+function buildClient(): Client {
+  const url = process.env.TURSO_DATABASE_URL;
   const authToken = process.env.TURSO_AUTH_TOKEN;
-  if (url.startsWith('file:')) {
-    const { createClient } = await import('@libsql/client');
-    return createClient({ url });
+  if (!url) {
+    throw new Error(
+      'TURSO_DATABASE_URL が未設定です。環境変数に Turso の接続URL（libsql://...）と TURSO_AUTH_TOKEN を設定してください。'
+    );
   }
-  return createWebClient(authToken ? { url, authToken } : { url });
+  return createClient(authToken ? { url, authToken } : { url });
 }
 
 export async function getDatabase(): Promise<Database> {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const client = await buildClient();
+      const client = buildClient();
 
       // スキーマ初期化（複数ステートメントは executeMultiple で実行）
       await client.executeMultiple(`
